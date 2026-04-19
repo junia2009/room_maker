@@ -56,7 +56,8 @@ function mmToPx(mm) { return mm * view2d.scale; }
 function pxToMm(px) { return px / view2d.scale; }
 
 function worldToScreen(xMm, yMm) {
-  const cw = canvas2d.width, ch = canvas2d.height;
+  const cw = canvas2d.width / devicePixelRatio;
+  const ch = canvas2d.height / devicePixelRatio;
   return {
     x: cw / 2 + (xMm - view2d.cx) * view2d.scale,
     y: ch / 2 + (yMm - view2d.cy) * view2d.scale,
@@ -64,7 +65,8 @@ function worldToScreen(xMm, yMm) {
 }
 
 function screenToWorld(sx, sy) {
-  const cw = canvas2d.width, ch = canvas2d.height;
+  const cw = canvas2d.width / devicePixelRatio;
+  const ch = canvas2d.height / devicePixelRatio;
   return {
     x: (sx - cw / 2) / view2d.scale + view2d.cx,
     y: (sy - ch / 2) / view2d.scale + view2d.cy,
@@ -72,8 +74,9 @@ function screenToWorld(sx, sy) {
 }
 
 function fitView() {
-  const cw = canvas2d.width, ch = canvas2d.height;
-  const pad = 120;
+  const cw = canvas2d.width / devicePixelRatio;
+  const ch = canvas2d.height / devicePixelRatio;
+  const pad = Math.min(cw, ch) * 0.08 + 40;
   const scaleX = (cw - pad) / state.room.w;
   const scaleY = (ch - pad) / state.room.d;
   view2d.scale = Math.min(scaleX, scaleY);
@@ -1529,6 +1532,7 @@ window.addEventListener('resize', () => {
   if ($('app').classList.contains('hidden')) return;
   if (state.viewMode === '2d') {
     resizeCanvas2d();
+    fitView();
     draw2d();
   } else {
     resize3d();

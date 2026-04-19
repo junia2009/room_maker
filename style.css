@@ -59,6 +59,8 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI','Hiragino Sans','Me
 }
 .top-import-btn:hover{background:#f0f0f0}
 
+.top-version{text-align:center;margin-top:32px;font-size:11px;color:#bbb}
+
 /* ========== HEADER ========== */
 #header{
   display:flex;align-items:center;justify-content:space-between;
