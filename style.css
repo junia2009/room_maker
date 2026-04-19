@@ -1,5 +1,6 @@
 /* ========== RESET & BASE ========== */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+input,select,textarea{font-size:16px}
 html,body{height:100%;overflow:hidden;font-family:'Segoe UI','Hiragino Sans','Meiryo',sans-serif;background:#f0f0f0;color:#333}
 
 .hidden{display:none!important}
