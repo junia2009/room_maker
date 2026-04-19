@@ -41,7 +41,10 @@
         <input type="file" id="fileImport" accept=".json" class="hidden" title="レイアウトファイル">
       </div>
 
-      <div class="top-version">ver 1.0.1</div>
+      <div class="top-footer">
+        <span class="top-version">ver 1.1.0</span>
+        <button class="top-reload-btn" id="btnForceReload">🔄 最新版に更新</button>
+      </div>
     </div>
   </div>
 
@@ -405,6 +408,15 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js');
     }
+    document.getElementById('btnForceReload').addEventListener('click', async () => {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+      const keys = await caches.keys();
+      await Promise.all(keys.map(k => caches.delete(k)));
+      location.reload();
+    });
   </script>
 </body>
 </html>
