@@ -1,0 +1,5 @@
+node_modules/
+generate-icons.js
+icons/icon.svg
+package.json
+package-lock.json
