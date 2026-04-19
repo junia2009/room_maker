@@ -35,6 +35,16 @@ const FURNITURE_DEFS = {
   wardrobe:     { name: 'ワードローブ',     w: 1000, d: 550,  h: 2000, color: '#7a6a5a' },
   desk:         { name: 'デスク',           w: 1200, d: 600,  h: 730,  color: '#a08060' },
   fridge:       { name: '冷蔵庫',           w: 650,  d: 650,  h: 1700, color: '#d0d0d0' },
+  kitchen:      { name: 'システムキッチン', w: 2550, d: 650,  h: 850,  color: '#e0e0e0' },
+  kitchenSmall: { name: 'ミニキッチン',     w: 1500, d: 600,  h: 850,  color: '#e0e0e0' },
+  cupboard:     { name: '食器棚',           w: 800,  d: 450,  h: 1800, color: '#a08060' },
+  microwave:    { name: '電子レンジ',       w: 500,  d: 400,  h: 350,  color: '#c0c0c0' },
+  washMachine:  { name: '洗濯機',           w: 600,  d: 600,  h: 1000, color: '#e8e8e8' },
+  wall1000:     { name: '壁 1m',            w: 1000, d: 120,  h: 2400, color: '#888888' },
+  wall1500:     { name: '壁 1.5m',          w: 1500, d: 120,  h: 2400, color: '#888888' },
+  wall2000:     { name: '壁 2m',            w: 2000, d: 120,  h: 2400, color: '#888888' },
+  wall3000:     { name: '壁 3m',            w: 3000, d: 120,  h: 2400, color: '#888888' },
+  wallHalf:     { name: '半壁 1m',          w: 1000, d: 120,  h: 1200, color: '#999999' },
 };
 
 /* ============================================================
@@ -927,6 +937,49 @@ function addFurnitureDetails(group, type, wM, dM, hM, def) {
       shade.position.y = hM * 0.9;
       shade.rotation.x = Math.PI;
       group.add(shade);
+      break;
+    }
+    case 'kitchen':
+    case 'kitchenSmall': {
+      // Countertop
+      const ctGeo = new THREE.BoxGeometry(wM, 0.04, dM);
+      const ctMat = new THREE.MeshStandardMaterial({ color: '#f0f0f0', roughness: 0.3, metalness: 0.1 });
+      const ct = new THREE.Mesh(ctGeo, ctMat);
+      ct.position.y = hM + 0.02;
+      group.add(ct);
+      // Sink basin
+      const sinkGeo = new THREE.BoxGeometry(wM * 0.25, 0.06, dM * 0.5);
+      const sinkMat = new THREE.MeshStandardMaterial({ color: '#c0c0c0', roughness: 0.2, metalness: 0.4 });
+      const sink = new THREE.Mesh(sinkGeo, sinkMat);
+      sink.position.set(-wM * 0.2, hM - 0.01, 0);
+      group.add(sink);
+      // Stove burners
+      const burnerMat = new THREE.MeshStandardMaterial({ color: '#333', roughness: 0.5, metalness: 0.3 });
+      for (const ox of [-0.12, 0.12]) {
+        const burner = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.01, 16), burnerMat);
+        burner.position.set(wM * 0.25 + ox, hM + 0.04, 0);
+        group.add(burner);
+      }
+      break;
+    }
+    case 'cupboard': {
+      // Shelves
+      const shelfMat = new THREE.MeshStandardMaterial({ color: adjustColor(def.color, -10), roughness: 0.7 });
+      for (let i = 1; i <= 3; i++) {
+        const shelf = new THREE.Mesh(new THREE.BoxGeometry(wM * 0.95, 0.02, dM * 0.9), shelfMat);
+        shelf.position.y = hM * (i / 4);
+        group.add(shelf);
+      }
+      break;
+    }
+    case 'washMachine': {
+      // Drum circle (front)
+      const drumGeo = new THREE.CylinderGeometry(wM * 0.3, wM * 0.3, 0.02, 24);
+      const drumMat = new THREE.MeshStandardMaterial({ color: '#ccc', roughness: 0.2, metalness: 0.3 });
+      const drum = new THREE.Mesh(drumGeo, drumMat);
+      drum.rotation.x = Math.PI / 2;
+      drum.position.set(0, hM * 0.45, dM / 2 + 0.01);
+      group.add(drum);
       break;
     }
   }
