@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Room Maker - 間取りシミュレーター</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- ========== トップ画面 ========== -->
+  <div id="top-screen">
+    <div class="top-container">
+      <div class="top-hero">
+        <h1>🏠 Room Maker</h1>
+        <p>3D 間取りシミュレーター</p>
+      </div>
+
+      <div class="top-actions">
+        <button class="top-new-btn" id="btnNewProject">
+          <span class="top-new-icon">＋</span>
+          <span>新規作成</span>
+        </button>
+      </div>
+
+      <div class="top-saved-section">
+        <h2>保存済みの間取り</h2>
+        <div class="top-saved-list" id="savedList">
+          <!-- JS で動的に描画 -->
+        </div>
+        <p class="top-empty-msg hidden" id="emptyMsg">保存済みの間取りはありません</p>
+      </div>
+
+      <div class="top-import-section">
+        <button class="top-import-btn" id="btnImportFile">📂 JSONファイルから読み込む</button>
+        <input type="file" id="fileImport" accept=".json" class="hidden" title="レイアウトファイル">
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== エディタ画面 ========== -->
+  <div id="app" class="hidden">
+    <!-- ヘッダー -->
+    <header id="header">
+      <div class="header-left">
+        <button class="header-btn" id="btnBackTop" title="トップに戻る">← 戻る</button>
+        <input type="text" id="projectName" class="project-name-input" value="新しい間取り" placeholder="間取りの名前" title="間取りの名前">
+      </div>
+      <div class="header-center">
+        <button class="view-tab active" id="tabFloorplan" title="間取り図（2D上面図）">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="14" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="1" x2="8" y2="15" stroke="currentColor" stroke-width="1.2"/><line x1="1" y1="8" x2="8" y2="8" stroke="currentColor" stroke-width="1.2"/></svg>
+          間取り図
+        </button>
+        <button class="view-tab" id="tab3D" title="3Dビュー">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 1L15 5V11L8 15L1 11V5L8 1Z" fill="none" stroke="currentColor" stroke-width="1.3"/><line x1="8" y1="15" x2="8" y2="7" stroke="currentColor" stroke-width="1.2"/><line x1="1" y1="5" x2="8" y2="7" stroke="currentColor" stroke-width="1.2"/><line x1="15" y1="5" x2="8" y2="7" stroke="currentColor" stroke-width="1.2"/></svg>
+          3Dビュー
+        </button>
+      </div>
+      <div class="header-right">
+        <button class="header-btn" id="btnSave" title="保存">💾 保存</button>
+        <button class="header-btn" id="btnExport" title="JSONエクスポート">📤 エクスポート</button>
+      </div>
+    </header>
+
+    <div id="main-area">
+      <!-- 左パネル -->
+      <aside id="sidebar">
+        <!-- ステップタブ -->
+        <div class="step-tabs">
+          <button class="step-tab active" data-step="room">
+            <span class="step-num">1</span>
+            <span class="step-label">部屋</span>
+          </button>
+          <button class="step-tab" data-step="openings">
+            <span class="step-num">2</span>
+            <span class="step-label">ドア・窓</span>
+          </button>
+          <button class="step-tab" data-step="materials">
+            <span class="step-num">3</span>
+            <span class="step-label">素材</span>
+          </button>
+          <button class="step-tab" data-step="furniture">
+            <span class="step-num">4</span>
+            <span class="step-label">家具</span>
+          </button>
+        </div>
+
+        <!-- STEP 1: 部屋 -->
+        <div class="step-content active" id="step-room">
+          <h3>部屋のサイズ</h3>
+          <div class="size-input-group">
+            <div class="size-input">
+              <label for="roomWidth">幅</label>
+              <div class="input-with-unit">
+                <input type="number" id="roomWidth" value="6000" min="2000" max="15000" step="100">
+                <span class="unit">mm</span>
+              </div>
+            </div>
+            <span class="size-x">×</span>
+            <div class="size-input">
+              <label for="roomDepth">奥行き</label>
+              <div class="input-with-unit">
+                <input type="number" id="roomDepth" value="5000" min="2000" max="15000" step="100">
+                <span class="unit">mm</span>
+              </div>
+            </div>
+          </div>
+          <div class="size-input-group single">
+            <div class="size-input">
+              <label for="roomHeight">天井高</label>
+              <div class="input-with-unit">
+                <input type="number" id="roomHeight" value="2400" min="2000" max="4000" step="100">
+                <span class="unit">mm</span>
+              </div>
+            </div>
+          </div>
+          <div class="room-info-box" id="roomInfoBox">
+            — ㎡ ｜ — 畳
+          </div>
+
+          <h3>テンプレート</h3>
+          <div class="template-grid">
+            <button class="template-btn" data-w="6000" data-d="5000">6畳<small>6×5m</small></button>
+            <button class="template-btn" data-w="7200" data-d="5400">8畳<small>7.2×5.4m</small></button>
+            <button class="template-btn" data-w="8000" data-d="6000">10畳<small>8×6m</small></button>
+            <button class="template-btn" data-w="7200" data-d="3600">ワンルーム<small>7.2×3.6m</small></button>
+            <button class="template-btn" data-w="10000" data-d="5000">LDK<small>10×5m</small></button>
+            <button class="template-btn" data-w="5400" data-d="3600">4.5畳<small>5.4×3.6m</small></button>
+          </div>
+        </div>
+
+        <!-- STEP 2: ドア・窓 -->
+        <div class="step-content" id="step-openings">
+          <h3>ドア</h3>
+          <div class="opening-control">
+            <div class="control-row">
+              <label for="doorWall">配置する壁</label>
+              <select id="doorWall" title="ドアを配置する壁">
+                <option value="south">南（手前）</option>
+                <option value="north">北（奥）</option>
+                <option value="west">西（左）</option>
+                <option value="east">東（右）</option>
+              </select>
+            </div>
+            <div class="control-row">
+              <label for="doorPos">位置</label>
+              <input type="range" id="doorPos" min="10" max="90" value="50">
+              <span class="val" id="doorPosVal">50%</span>
+            </div>
+            <div class="control-row">
+              <label for="doorWidth">幅</label>
+              <div class="input-with-unit small">
+                <input type="number" id="doorWidth" value="800" min="600" max="1200" step="50">
+                <span class="unit">mm</span>
+              </div>
+            </div>
+          </div>
+
+          <h3>窓</h3>
+          <div class="opening-control">
+            <div class="control-row">
+              <label for="windowWall">配置する壁</label>
+              <select id="windowWall" title="窓を配置する壁">
+                <option value="north" selected>北（奥）</option>
+                <option value="south">南（手前）</option>
+                <option value="west">西（左）</option>
+                <option value="east">東（右）</option>
+              </select>
+            </div>
+            <div class="control-row">
+              <label for="windowPos">位置</label>
+              <input type="range" id="windowPos" min="10" max="90" value="50">
+              <span class="val" id="windowPosVal">50%</span>
+            </div>
+            <div class="control-row">
+              <label for="windowW">幅</label>
+              <div class="input-with-unit small">
+                <input type="number" id="windowW" value="1800" min="500" max="4000" step="100">
+                <span class="unit">mm</span>
+              </div>
+            </div>
+            <div class="control-row">
+              <label for="windowH">高さ</label>
+              <div class="input-with-unit small">
+                <input type="number" id="windowH" value="1200" min="400" max="2200" step="100">
+                <span class="unit">mm</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: 素材 -->
+        <div class="step-content" id="step-materials">
+          <h3>床</h3>
+          <div class="material-swatches" id="floorSwatches">
+            <button class="swatch active" data-color="#c8a876" title="オーク"><span></span></button>
+            <button class="swatch" data-color="#a0784c" title="ウォールナット"><span></span></button>
+            <button class="swatch" data-color="#ddc89e" title="メープル"><span></span></button>
+            <button class="swatch" data-color="#b89070" title="チェリー"><span></span></button>
+            <button class="swatch" data-color="#e8dcc8" title="アッシュ"><span></span></button>
+            <button class="swatch" data-color="#8c8c8c" title="コンクリート"><span></span></button>
+            <button class="swatch" data-color="#f0f0f0" title="ホワイト"><span></span></button>
+            <button class="swatch" data-color="#e0d5c0" title="ベージュ"><span></span></button>
+          </div>
+
+          <h3>壁</h3>
+          <div class="material-swatches" id="wallSwatches">
+            <button class="swatch active" data-color="#f5f0e8" title="オフホワイト"><span></span></button>
+            <button class="swatch" data-color="#ffffff" title="ホワイト"><span></span></button>
+            <button class="swatch" data-color="#e8e4dc" title="ベージュ"><span></span></button>
+            <button class="swatch" data-color="#d4cfc5" title="グレージュ"><span></span></button>
+            <button class="swatch" data-color="#c0c0c0" title="グレー"><span></span></button>
+            <button class="swatch" data-color="#d5e0d0" title="グリーン"><span></span></button>
+            <button class="swatch" data-color="#d0d8e8" title="ブルー"><span></span></button>
+            <button class="swatch" data-color="#e0d4c8" title="ピンク"><span></span></button>
+          </div>
+
+          <h3>天井</h3>
+          <div class="material-swatches" id="ceilingSwatches">
+            <button class="swatch active" data-color="#ffffff" title="ホワイト"><span></span></button>
+            <button class="swatch" data-color="#f5f5f0" title="アイボリー"><span></span></button>
+            <button class="swatch" data-color="#e0e0e0" title="ライトグレー"><span></span></button>
+            <button class="swatch" data-color="#d8ccb8" title="ウッド"><span></span></button>
+          </div>
+        </div>
+
+        <!-- STEP 4: 家具 -->
+        <div class="step-content" id="step-furniture">
+          <h3>リビング</h3>
+          <div class="furniture-catalog">
+            <button class="catalog-item" data-type="sofa">
+              <div class="catalog-icon">🛋</div>
+              <div class="catalog-name">ソファ</div>
+              <div class="catalog-size">W1800×D800</div>
+            </button>
+            <button class="catalog-item" data-type="table">
+              <div class="catalog-icon">☕</div>
+              <div class="catalog-name">テーブル</div>
+              <div class="catalog-size">W1000×D600</div>
+            </button>
+            <button class="catalog-item" data-type="tv">
+              <div class="catalog-icon">📺</div>
+              <div class="catalog-name">テレビ台</div>
+              <div class="catalog-size">W1200×D400</div>
+            </button>
+            <button class="catalog-item" data-type="bookshelf">
+              <div class="catalog-icon">📚</div>
+              <div class="catalog-name">本棚</div>
+              <div class="catalog-size">W800×D350</div>
+            </button>
+            <button class="catalog-item" data-type="rug">
+              <div class="catalog-icon">🟫</div>
+              <div class="catalog-name">ラグ</div>
+              <div class="catalog-size">W2000×D1400</div>
+            </button>
+            <button class="catalog-item" data-type="plant">
+              <div class="catalog-icon">🪴</div>
+              <div class="catalog-name">観葉植物</div>
+              <div class="catalog-size">W400×D400</div>
+            </button>
+            <button class="catalog-item" data-type="lamp">
+              <div class="catalog-icon">💡</div>
+              <div class="catalog-name">フロアランプ</div>
+              <div class="catalog-size">W350×D350</div>
+            </button>
+          </div>
+
+          <h3>ダイニング</h3>
+          <div class="furniture-catalog">
+            <button class="catalog-item" data-type="diningTable">
+              <div class="catalog-icon">🍽</div>
+              <div class="catalog-name">ダイニングテーブル</div>
+              <div class="catalog-size">W1500×D800</div>
+            </button>
+            <button class="catalog-item" data-type="chair">
+              <div class="catalog-icon">🪑</div>
+              <div class="catalog-name">チェア</div>
+              <div class="catalog-size">W450×D450</div>
+            </button>
+          </div>
+
+          <h3>寝室</h3>
+          <div class="furniture-catalog">
+            <button class="catalog-item" data-type="bed">
+              <div class="catalog-icon">🛏</div>
+              <div class="catalog-name">ベッド</div>
+              <div class="catalog-size">W1400×D2000</div>
+            </button>
+            <button class="catalog-item" data-type="wardrobe">
+              <div class="catalog-icon">🚪</div>
+              <div class="catalog-name">ワードローブ</div>
+              <div class="catalog-size">W1000×D550</div>
+            </button>
+            <button class="catalog-item" data-type="desk">
+              <div class="catalog-icon">🖥</div>
+              <div class="catalog-name">デスク</div>
+              <div class="catalog-size">W1200×D600</div>
+            </button>
+          </div>
+
+          <h3>キッチン</h3>
+          <div class="furniture-catalog">
+            <button class="catalog-item" data-type="fridge">
+              <div class="catalog-icon">🧊</div>
+              <div class="catalog-name">冷蔵庫</div>
+              <div class="catalog-size">W650×D650</div>
+            </button>
+          </div>
+
+          <!-- 選択中家具パネル -->
+          <div id="selectedPanel" class="hidden">
+            <h3>選択中: <span id="selName"></span></h3>
+            <div class="sel-controls">
+              <div class="sel-size-group">
+                <div class="sel-size-input">
+                  <label for="selW">幅(W)</label>
+                  <div class="input-with-unit small">
+                    <input type="number" id="selW" min="100" max="5000" step="50">
+                    <span class="unit">mm</span>
+                  </div>
+                </div>
+                <div class="sel-size-input">
+                  <label for="selD">奥行(D)</label>
+                  <div class="input-with-unit small">
+                    <input type="number" id="selD" min="100" max="5000" step="50">
+                    <span class="unit">mm</span>
+                  </div>
+                </div>
+                <div class="sel-size-input">
+                  <label for="selH">高さ(H)</label>
+                  <div class="input-with-unit small">
+                    <input type="number" id="selH" min="10" max="3000" step="50">
+                    <span class="unit">mm</span>
+                  </div>
+                </div>
+              </div>
+              <div class="sel-size-display" id="selSizeDisplay"></div>
+              <div class="control-row">
+                <label for="selRotation">回転</label>
+                <input type="range" id="selRotation" min="0" max="360" step="15" value="0">
+                <span class="val" id="selRotVal">0°</span>
+              </div>
+              <div class="sel-actions">
+                <button class="sel-btn" id="btnRotate90">90°回転</button>
+                <button class="sel-btn" id="btnResetSize">サイズリセット</button>
+                <button class="sel-btn" id="btnDuplicate">複製</button>
+                <button class="sel-btn danger" id="btnDelete">削除</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- メインキャンバス -->
+      <main id="viewport">
+        <!-- 2D間取り図 -->
+        <canvas id="canvas2d"></canvas>
+        <!-- 3Dビュー -->
+        <canvas id="canvas3d" class="hidden"></canvas>
+
+        <!-- 下部ツールバー -->
+        <div id="bottom-bar">
+          <div class="bottom-left">
+            <span id="roomDims"></span>
+          </div>
+          <div class="bottom-center">
+            <button class="bottom-btn" id="btnZoomIn" title="ズームイン">＋</button>
+            <button class="bottom-btn" id="btnZoomOut" title="ズームアウト">－</button>
+            <button class="bottom-btn" id="btnFitView" title="全体表示">⊞</button>
+          </div>
+          <div class="bottom-right">
+            <label class="snap-label">
+              <input type="checkbox" id="snapToggle" checked>
+              スナップ
+            </label>
+            <select id="snapSizeSelect" class="snap-size-select" title="スナップ間隔">
+              <option value="50" selected>50mm</option>
+              <option value="100">100mm</option>
+              <option value="250">250mm</option>
+              <option value="500">500mm</option>
+            </select>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.164.1/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.164.1/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="app.js"></script>
+</body>
+</html>
