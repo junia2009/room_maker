@@ -49,6 +49,7 @@ export class EditorController {
       'addFurniture', 'removeFurniture', 'duplicateFurniture',
       'updateSelectedSize', 'updateSelectedRotation', 'rotateSelectedBy', 'resetSelectedSize',
       'moveFurniture', 'addRoom', 'removeRoom', 'setActiveRoomId',
+      'setShowDimensions',
     ]);
   }
 

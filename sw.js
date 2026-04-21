@@ -1,4 +1,4 @@
-const CACHE_NAME = 'room-maker-v11';
+const CACHE_NAME = 'room-maker-v12';
 const ASSETS = [
   './',
   './index.html',

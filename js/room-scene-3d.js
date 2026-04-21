@@ -109,6 +109,10 @@ export class RoomScene3D {
       .filter(item => item.roomId === room.id)
       .forEach(item => this.buildFurniture(item, room));
 
+    if (state.showDimensions !== false) {
+      this.buildDimensions(room, roomWidthM, roomDepthM);
+    }
+
     if (!state.cameraInitialized3d) {
       state.cameraInitialized3d = true;
       const maxDimension = Math.max(roomWidthM, roomDepthM);
@@ -135,6 +139,183 @@ export class RoomScene3D {
       });
       this.scene.remove(object);
     });
+  }
+
+  buildDimensions(room, roomWidthM, roomDepthM) {
+    const group = new THREE.Group();
+    group.name = 'dimensions';
+    const y = 0.005;
+    const offset = 0.35;       // 外側総寸法のオフセット (m)
+    const innerOffset = 0.15;  // 開口チェーン寸法のオフセット (m)
+    const tickSize = 0.08;
+    const lineMat = new THREE.LineBasicMaterial({ color: 0x666666 });
+    const lineMatBlue = new THREE.LineBasicMaterial({ color: 0x4a90d9 });
+
+    const addLine = (x1, z1, x2, z2, mat = lineMat) => {
+      const geom = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(x1, y, z1),
+        new THREE.Vector3(x2, y, z2),
+      ]);
+      group.add(new THREE.Line(geom, mat));
+    };
+
+    // 横方向の寸法（X 軸沿い、Z = z 位置）
+    const drawHorizontalDim = (xStart, xEnd, z, valueMm, color = '#666') => {
+      const mat = color === '#4a90d9' ? lineMatBlue : lineMat;
+      addLine(xStart, z, xEnd, z, mat);
+      addLine(xStart, z - tickSize / 2, xStart, z + tickSize / 2, mat);
+      addLine(xEnd, z - tickSize / 2, xEnd, z + tickSize / 2, mat);
+      const sprite = this.makeDimSprite(`${Math.round(valueMm)}`, color);
+      sprite.position.set((xStart + xEnd) / 2, y + 0.02, z);
+      group.add(sprite);
+    };
+
+    // 奥行き方向の寸法（Z 軸沿い、X = x 位置）
+    const drawVerticalDim = (zStart, zEnd, x, valueMm, color = '#666') => {
+      const mat = color === '#4a90d9' ? lineMatBlue : lineMat;
+      addLine(x, zStart, x, zEnd, mat);
+      addLine(x - tickSize / 2, zStart, x + tickSize / 2, zStart, mat);
+      addLine(x - tickSize / 2, zEnd, x + tickSize / 2, zEnd, mat);
+      const sprite = this.makeDimSprite(`${Math.round(valueMm)}`, color);
+      sprite.position.set(x, y + 0.02, (zStart + zEnd) / 2);
+      group.add(sprite);
+    };
+
+    // 開口部チェーン分割計算（mm → m）
+    const wallSplits = (wallName, lengthMm) => {
+      const ops = this.stateManager.getOpeningsForWall(wallName, room.id)
+        .map(op => ({
+          start: lengthMm * (op.positionPercent / 100) - op.width / 2,
+          end: lengthMm * (op.positionPercent / 100) + op.width / 2,
+        }))
+        .filter(s => s.end > 0 && s.start < lengthMm)
+        .sort((a, b) => a.start - b.start);
+      const points = [0, lengthMm];
+      ops.forEach(op => {
+        points.push(Math.max(0, op.start));
+        points.push(Math.min(lengthMm, op.end));
+      });
+      const splits = [...new Set(points.map(p => Math.round(p)))].sort((a, b) => a - b);
+      return { ops, splits };
+    };
+
+    // === 北辺 (z = 0): 上方向 (z 負) ===
+    {
+      const { ops, splits } = wallSplits('north', room.w);
+      // 総寸法
+      drawHorizontalDim(0, roomWidthM, -offset, room.w, '#666');
+      // チェーン
+      if (ops.length > 0) {
+        for (let i = 0; i < splits.length - 1; i++) {
+          const xs = splits[i] / 1000;
+          const xe = splits[i + 1] / 1000;
+          const isOp = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
+          drawHorizontalDim(xs, xe, -innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
+        }
+      }
+    }
+
+    // === 南辺 (z = roomDepthM): 下方向 (z 正) ===
+    {
+      const { ops, splits } = wallSplits('south', room.w);
+      drawHorizontalDim(0, roomWidthM, roomDepthM + offset, room.w, '#666');
+      if (ops.length > 0) {
+        for (let i = 0; i < splits.length - 1; i++) {
+          const xs = splits[i] / 1000;
+          const xe = splits[i + 1] / 1000;
+          const isOp = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
+          drawHorizontalDim(xs, xe, roomDepthM + innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
+        }
+      }
+    }
+
+    // === 西辺 (x = 0): 左方向 (x 負) ===
+    // 注: buildWall で west/east の開口は positionPercent を反転している (1 - p/100)
+    // つまり 3D 上の Z 座標 = roomDepthM - (positionMm/1000)
+    {
+      const ops = this.stateManager.getOpeningsForWall('west', room.id);
+      const splitsMm = [0, room.d];
+      ops.forEach(op => {
+        const centerMm = room.d * (1 - op.positionPercent / 100);
+        splitsMm.push(Math.max(0, centerMm - op.width / 2));
+        splitsMm.push(Math.min(room.d, centerMm + op.width / 2));
+      });
+      const splits = [...new Set(splitsMm.map(p => Math.round(p)))].sort((a, b) => a - b);
+      drawVerticalDim(0, roomDepthM, -offset, room.d, '#666');
+      if (ops.length > 0) {
+        for (let i = 0; i < splits.length - 1; i++) {
+          const zs = splits[i] / 1000;
+          const ze = splits[i + 1] / 1000;
+          const isOp = ops.some(op => {
+            const centerMm = room.d * (1 - op.positionPercent / 100);
+            return Math.round(centerMm - op.width / 2) <= splits[i] && splits[i + 1] <= Math.round(centerMm + op.width / 2);
+          });
+          drawVerticalDim(zs, ze, -innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
+        }
+      }
+    }
+
+    // === 東辺 (x = roomWidthM): 右方向 (x 正) ===
+    {
+      const ops = this.stateManager.getOpeningsForWall('east', room.id);
+      const splitsMm = [0, room.d];
+      ops.forEach(op => {
+        const centerMm = room.d * (1 - op.positionPercent / 100);
+        splitsMm.push(Math.max(0, centerMm - op.width / 2));
+        splitsMm.push(Math.min(room.d, centerMm + op.width / 2));
+      });
+      const splits = [...new Set(splitsMm.map(p => Math.round(p)))].sort((a, b) => a - b);
+      drawVerticalDim(0, roomDepthM, roomWidthM + offset, room.d, '#666');
+      if (ops.length > 0) {
+        for (let i = 0; i < splits.length - 1; i++) {
+          const zs = splits[i] / 1000;
+          const ze = splits[i + 1] / 1000;
+          const isOp = ops.some(op => {
+            const centerMm = room.d * (1 - op.positionPercent / 100);
+            return Math.round(centerMm - op.width / 2) <= splits[i] && splits[i + 1] <= Math.round(centerMm + op.width / 2);
+          });
+          drawVerticalDim(zs, ze, roomWidthM + innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
+        }
+      }
+    }
+
+    this.scene.add(group);
+  }
+
+  makeDimSprite(text, color = '#666') {
+    const canvas = document.createElement('canvas');
+    const dpr = 2;
+    const fontPx = 56;
+    const ctx = canvas.getContext('2d');
+    ctx.font = `bold ${fontPx}px sans-serif`;
+    const textWidth = ctx.measureText(text).width;
+    const padX = 16;
+    const padY = 10;
+    canvas.width = (textWidth + padX * 2) * dpr;
+    canvas.height = (fontPx + padY * 2) * dpr;
+    const c = canvas.getContext('2d');
+    c.scale(dpr, dpr);
+    c.fillStyle = 'rgba(255,255,255,0.9)';
+    c.fillRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+    c.strokeStyle = color;
+    c.lineWidth = 1;
+    c.strokeRect(0.5, 0.5, canvas.width / dpr - 1, canvas.height / dpr - 1);
+    c.fillStyle = color;
+    c.font = `bold ${fontPx}px sans-serif`;
+    c.textBaseline = 'middle';
+    c.textAlign = 'center';
+    c.fillText(text, (canvas.width / dpr) / 2, (canvas.height / dpr) / 2);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.minFilter = THREE.LinearFilter;
+    texture.needsUpdate = true;
+    const mat = new THREE.SpriteMaterial({ map: texture, transparent: true, depthTest: false, depthWrite: false });
+    const sprite = new THREE.Sprite(mat);
+    // 1m あたり 0.18 を基準にスケール
+    const scale = 0.0035;
+    sprite.scale.set(canvas.width / dpr * scale, canvas.height / dpr * scale, 1);
+    sprite.renderOrder = 999;
+    return sprite;
   }
 
   buildWall(wallName, roomWidthM, roomHeightM, roomDepthM) {
