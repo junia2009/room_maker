@@ -86,9 +86,10 @@ export class RoomScene3D {
     this.clearScene();
 
     const state = this.stateManager.state;
-    const roomWidthM = state.room.w / 1000;
-    const roomDepthM = state.room.d / 1000;
-    const roomHeightM = state.room.h / 1000;
+    const room = this.stateManager.getPrimaryRoom() || state.room;
+    const roomWidthM = room.w / 1000;
+    const roomDepthM = room.d / 1000;
+    const roomHeightM = room.h / 1000;
 
     const floor = new THREE.Mesh(
       new THREE.PlaneGeometry(roomWidthM, roomDepthM),
@@ -135,36 +136,26 @@ export class RoomScene3D {
 
   buildWall(wallName, roomWidthM, roomHeightM, roomDepthM) {
     const state = this.stateManager.state;
+    const room = this.stateManager.getActiveRoom() || state.room;
     const thickness = 0.08;
     const isHorizontal = wallName === 'south' || wallName === 'north';
     const wallLengthM = isHorizontal ? roomWidthM : roomDepthM;
-    const wallLengthMm = isHorizontal ? state.room.w : state.room.d;
+    const wallLengthMm = isHorizontal ? room.w : room.d;
     const isVerticalWall = wallName === 'west' || wallName === 'east';
-    const openings = [];
-
-    if (state.door.wall === wallName) {
-      const centerMm = isVerticalWall ? wallLengthMm * (1 - state.door.pos / 100) : wallLengthMm * (state.door.pos / 100);
-      openings.push({
-        startM: (centerMm - state.door.width / 2) / 1000,
-        endM: (centerMm + state.door.width / 2) / 1000,
-        bottomM: 0,
-        topM: 2.1,
-        type: 'door',
-      });
-    }
-
-    if (state.window.wall === wallName) {
-      const centerMm = isVerticalWall ? wallLengthMm * (1 - state.window.pos / 100) : wallLengthMm * (state.window.pos / 100);
-      const windowHeightM = state.window.h / 1000;
-      const sillM = (roomHeightM - windowHeightM) * 0.5 + 0.3;
-      openings.push({
-        startM: (centerMm - state.window.w / 2) / 1000,
-        endM: (centerMm + state.window.w / 2) / 1000,
-        bottomM: sillM,
-        topM: sillM + windowHeightM,
-        type: 'window',
-      });
-    }
+    const openings = this.stateManager.getOpeningsForWall(wallName).map(opening => {
+      const centerMm = isVerticalWall ? wallLengthMm * (1 - opening.positionPercent / 100) : wallLengthMm * (opening.positionPercent / 100);
+      const openingHeightM = opening.height / 1000;
+      const defaultBottomM = opening.kind === 'door' ? 0 : (roomHeightM - openingHeightM) * 0.5 + 0.3;
+      const bottomM = opening.bottomOffset == null ? defaultBottomM : opening.bottomOffset / 1000;
+      return {
+        startM: (centerMm - opening.width / 2) / 1000,
+        endM: (centerMm + opening.width / 2) / 1000,
+        bottomM,
+        topM: bottomM + openingHeightM,
+        type: opening.kind,
+        subtype: opening.subtype,
+      };
+    });
 
     if (openings.length === 0) {
       const mesh = new THREE.Mesh(
@@ -227,9 +218,9 @@ export class RoomScene3D {
     const glass = new THREE.Mesh(
       new THREE.PlaneGeometry(opening.endM - opening.startM, opening.topM - opening.bottomM),
       new THREE.MeshPhysicalMaterial({
-        color: 0x88bbdd,
+        color: opening.subtype === 'fix' ? 0x9fd9f5 : 0x88bbdd,
         transparent: true,
-        opacity: 0.3,
+        opacity: opening.subtype === 'sweepout' ? 0.45 : 0.3,
         roughness: 0.05,
         metalness: 0.1,
         side: THREE.DoubleSide,
@@ -289,7 +280,7 @@ export class RoomScene3D {
 
     const body = new THREE.Mesh(
       new THREE.BoxGeometry(widthM, heightM, depthM),
-      new THREE.MeshStandardMaterial({ color: definition.color, roughness: 0.7, metalness: 0.05 })
+      new THREE.MeshStandardMaterial({ color: item.customColor || definition.color, roughness: 0.7, metalness: 0.05 })
     );
     body.position.y = heightM / 2;
     body.castShadow = true;

@@ -36,6 +36,9 @@ export class ProjectStore {
   normalizeProjectData(data = {}) {
     return {
       room: data.room,
+      rooms: Array.isArray(data.rooms) ? data.rooms : undefined,
+      walls: Array.isArray(data.walls) ? data.walls : undefined,
+      openings: Array.isArray(data.openings) ? data.openings : undefined,
       colors: data.colors,
       door: data.door,
       window: data.window,

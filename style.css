@@ -153,6 +153,28 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI','Hiragino Sans','Me
 }
 .step-content h3:not(:first-child){margin-top:18px}
 
+/* Room List */
+.room-list{display:flex;flex-direction:column;gap:4px;margin-bottom:8px;max-height:140px;overflow-y:auto}
+.room-list-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 10px;border:1px solid #e0e0e0;border-radius:6px;
+  background:#fafafa;cursor:pointer;font-size:12px;color:#555;
+  transition:all .15s;
+}
+.room-list-item:hover{border-color:#3a5a3a;background:#f5f9f5}
+.room-list-item.active{border-color:#3a5a3a;background:#edf5ed;color:#3a5a3a;font-weight:700}
+.room-list-item-name{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.room-list-name-input{
+  flex:1;min-width:0;border:1px solid transparent;border-radius:3px;
+  background:transparent;font-size:12px;color:inherit;font-weight:inherit;
+  outline:none;padding:1px 3px;cursor:text;
+}
+.room-list-item.active .room-list-name-input{color:#3a5a3a;font-weight:700}
+.room-list-name-input:hover{background:rgba(255,255,255,0.7);border-color:#ccc}
+.room-list-name-input:focus{background:#fff;border-color:#3a5a3a}
+.room-list-item-dims{font-size:10px;color:#aaa;flex-shrink:0;margin-left:8px}
+.room-list-actions{display:flex;gap:6px;margin-bottom:4px}
+
 /* Size Inputs */
 .size-input-group{display:flex;align-items:center;gap:8px;margin-bottom:10px}
 .size-input-group.single{justify-content:flex-start}
@@ -199,8 +221,58 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI','Hiragino Sans','Me
   flex:1;padding:5px 8px;border:1px solid #ddd;border-radius:4px;
   font-size:12px;background:#fff;
 }
+.opening-toolbar{
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+  gap:8px;
+}
+.opening-target-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
+.opening-target-row label{
+  align-self:center;
+}
+.opening-target-row select{
+  flex:1 1 auto;
+  min-width:0;
+}
+.opening-action-row{
+  display:flex;
+  gap:8px;
+  padding-left:58px;
+}
+.opening-action-row .saved-card-btn{
+  flex:0 0 auto;
+  padding:6px 10px;
+  font-size:11px;
+  white-space:nowrap;
+}
 .control-row input[type="range"]{flex:1;accent-color:#3a5a3a}
 .control-row .val{font-size:11px;color:#999;width:36px;text-align:right}
+
+@media (max-width: 520px){
+  .opening-target-row{
+    flex-wrap:wrap;
+  }
+
+  .opening-target-row label{
+    width:100%;
+  }
+
+  .opening-target-row select{
+    min-width:100%;
+    flex-basis:100%;
+  }
+
+  .opening-action-row{
+    padding-left:0;
+    flex-wrap:wrap;
+  }
+}
 
 /* Material Swatches */
 .material-swatches{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
@@ -284,6 +356,32 @@ html,body{height:100%;overflow:hidden;font-family:'Segoe UI','Hiragino Sans','Me
   -moz-appearance:none;appearance:none;
 }
 .bottom-right{display:flex;align-items:center;gap:10px}
+
+/* ========== ALL-ROOMS AREA SUMMARY ========== */
+.all-rooms-area{
+  display:flex;flex-direction:column;gap:2px;
+  font-size:11px;color:#555;padding:6px 10px;
+  background:#f8faf8;border-radius:6px;border:1px solid #ddd;margin-top:4px;
+}
+.all-rooms-area span{color:#666}
+.all-rooms-area strong{color:#3a5a3a;margin-top:2px}
+
+/* ========== CATALOG SEARCH ========== */
+.catalog-search-box{padding:4px 0 8px;}
+.catalog-search-box input{
+  width:100%;box-sizing:border-box;padding:6px 10px;
+  border:1px solid #ccc;border-radius:20px;font-size:13px;outline:none;
+}
+.catalog-search-box input:focus{border-color:#6aaa6a;}
+.catalog-item.hidden{display:none!important;}
+.catalog-section-header.hidden-section{display:none!important;}
+#allRoomsArea{display:none;}
+#groupControls{display:none;}
+#wallThicknessRange{width:60px;}
+
+/* ========== NORTH ANGLE ========== */
+.north-presets{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+.north-presets .template-btn{flex:1;min-width:60px;font-size:11px;padding:4px 2px}
 
 /* ========== SCROLLBAR ========== */
 .step-content::-webkit-scrollbar{width:6px}

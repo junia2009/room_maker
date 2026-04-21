@@ -23,17 +23,17 @@
 
       <div class="top-actions">
         <button class="top-new-btn" id="btnNewProject">
-          <span class="top-new-icon">＋</span>
-          <span>新規作成</span>
+          <span class="top-new-icon">�E�E/span>
+          <span>新規作�E</span>
         </button>
       </div>
 
       <div class="top-saved-section">
-        <h2>保存済みの間取り</h2>
+        <h2>保存済みの間取めE/h2>
         <div class="top-saved-list" id="savedList">
           <!-- JS で動的に描画 -->
         </div>
-        <p class="top-empty-msg hidden" id="emptyMsg">保存済みの間取りはありません</p>
+        <p class="top-empty-msg hidden" id="emptyMsg">保存済みの間取り�Eありません</p>
       </div>
 
       <div class="top-import-section">
@@ -42,22 +42,22 @@
       </div>
 
       <div class="top-footer">
-        <span class="top-version">ver 1.3.0</span>
+        <span class="top-version">ver 1.4.0</span>
         <button class="top-reload-btn" id="btnForceReload">🔄 最新版に更新</button>
       </div>
     </div>
   </div>
 
-  <!-- ========== エディタ画面 ========== -->
+  <!-- ========== エチE��タ画面 ========== -->
   <div id="app" class="hidden">
     <!-- ヘッダー -->
     <header id="header">
       <div class="header-left">
-        <button class="header-btn" id="btnBackTop" title="トップに戻る">← 戻る</button>
-        <input type="text" id="projectName" class="project-name-input" value="新しい間取り" placeholder="間取りの名前" title="間取りの名前">
+        <button class="header-btn" id="btnBackTop" title="トップに戻めE>ↁE戻めE/button>
+        <input type="text" id="projectName" class="project-name-input" value="新しい間取めE placeholder="間取り�E名前" title="間取り�E名前">
       </div>
       <div class="header-center">
-        <button class="view-tab active" id="tabFloorplan" title="間取り図（2D上面図）">
+        <button class="view-tab active" id="tabFloorplan" title="間取り図�E�ED上面図�E�E>
           <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><rect x="1" y="1" width="14" height="14" rx="1" fill="none" stroke="currentColor" stroke-width="1.5"/><line x1="8" y1="1" x2="8" y2="15" stroke="currentColor" stroke-width="1.2"/><line x1="1" y1="8" x2="8" y2="8" stroke="currentColor" stroke-width="1.2"/></svg>
           間取り図
         </button>
@@ -67,27 +67,31 @@
         </button>
       </div>
       <div class="header-right">
-        <button class="header-btn" id="btnSave" title="保存">💾 保存</button>
-        <button class="header-btn" id="btnExport" title="JSONエクスポート">📤 エクスポート</button>
+        <button class="header-btn" id="btnSave" title="保孁E>💾 保孁E/button>
+        <button class="header-btn icon-btn" id="btnUndo" title="允E��戻ぁE(Ctrl+Z)" disabled>↩</button>
+        <button class="header-btn icon-btn" id="btnRedo" title="めE��直ぁE(Ctrl+Y)" disabled>↪</button>
+        <button class="header-btn" id="btnExportPng" title="PNG画像として保孁E>🖼�E�EPNG</button>
+        <button class="header-btn" id="btnPrint" title="印刷 / PDF保孁E>🖨�E�E印刷/PDF</button>
+        <button class="header-btn" id="btnExport" title="JSONエクスポ�EチE>📤 エクスポ�EチE/button>
       </div>
     </header>
 
     <div id="main-area">
       <!-- 左パネル -->
       <aside id="sidebar">
-        <!-- ステップタブ -->
+        <!-- スチE��プタチE-->
         <div class="step-tabs">
           <button class="step-tab active" data-step="room">
             <span class="step-num">1</span>
-            <span class="step-label">部屋</span>
+            <span class="step-label">部屁E/span>
           </button>
           <button class="step-tab" data-step="openings">
             <span class="step-num">2</span>
-            <span class="step-label">ドア・窓</span>
+            <span class="step-label">ドア・突E/span>
           </button>
           <button class="step-tab" data-step="materials">
             <span class="step-num">3</span>
-            <span class="step-label">素材</span>
+            <span class="step-label">素杁E/span>
           </button>
           <button class="step-tab" data-step="furniture">
             <span class="step-num">4</span>
@@ -95,18 +99,26 @@
           </button>
         </div>
 
-        <!-- STEP 1: 部屋 -->
+        <!-- STEP 1: 部屁E-->
         <div class="step-content active" id="step-room">
-          <h3>部屋のサイズ</h3>
+          <h3>部屋一覧</h3>
+          <div class="room-list" id="roomList">
+            <!-- JS で動的に描画 -->
+          </div>
+          <div class="room-list-actions">
+            <button type="button" class="saved-card-btn" id="btnAddRoom">�E�E部屋を追加</button>            <button type="button" class="saved-card-btn" id="btnAddLRoom" title="L字型部屋(2部屋)を追加">L字型</button>            <button type="button" class="saved-card-btn danger" id="btnRemoveRoom">削除</button>
+          </div>
+
+          <h3>部屋�Eサイズ</h3>
           <div class="size-input-group">
             <div class="size-input">
-              <label for="roomWidth">幅</label>
+              <label for="roomWidth">幁E/label>
               <div class="input-with-unit">
                 <input type="number" id="roomWidth" value="6000" min="2000" max="15000" step="100">
                 <span class="unit">mm</span>
               </div>
             </div>
-            <span class="size-x">×</span>
+            <span class="size-x">ÁE/span>
             <div class="size-input">
               <label for="roomDepth">奥行き</label>
               <div class="input-with-unit">
@@ -117,7 +129,7 @@
           </div>
           <div class="size-input-group single">
             <div class="size-input">
-              <label for="roomHeight">天井高</label>
+              <label for="roomHeight">天井髁E/label>
               <div class="input-with-unit">
                 <input type="number" id="roomHeight" value="2400" min="2000" max="4000" step="100">
                 <span class="unit">mm</span>
@@ -125,28 +137,57 @@
             </div>
           </div>
           <div class="room-info-box" id="roomInfoBox">
-            — ㎡ ｜ — 畳
-          </div>
-
-          <h3>テンプレート</h3>
+             E㎡ �E�E E畳
+          </div>          <div class="all-rooms-area" id="allRoomsArea"></div>
+          <h3>チE��プレーチE/h3>
           <div class="template-grid">
-            <button class="template-btn" data-w="3640" data-d="2730">6畳<small>3.64×2.73m</small></button>
-            <button class="template-btn" data-w="3640" data-d="3640">8畳<small>3.64×3.64m</small></button>
-            <button class="template-btn" data-w="4550" data-d="3640">10畳<small>4.55×3.64m</small></button>
+            <button class="template-btn" data-w="3640" data-d="2730">6畳<small>3.64ÁE.73m</small></button>
+            <button class="template-btn" data-w="3640" data-d="3640">8畳<small>3.64ÁE.64m</small></button>
+            <button class="template-btn" data-w="4550" data-d="3640">10畳<small>4.55ÁE.64m</small></button>
           </div>
-        </div>
+          <h3>方位設宁E/h3>
+          <div class="control-row">
+            <label for="northAngle">北方吁E/label>
+            <input type="range" id="northAngle" min="0" max="359" step="1" value="0">
+            <span class="val" id="northAngleVal">0°</span>
+          </div>
+          <div class="north-presets">
+            <button class="template-btn" data-north="0">上が匁E/button>
+            <button class="template-btn" data-north="90">上が西</button>
+            <button class="template-btn" data-north="180">上が十E/button>
+            <button class="template-btn" data-north="270">上が東</button>
+          </div>        </div>
 
-        <!-- STEP 2: ドア・窓 -->
+        <!-- STEP 2: ドア・突E-->
         <div class="step-content" id="step-openings">
           <h3>ドア</h3>
           <div class="opening-control">
+            <div class="control-row opening-toolbar">
+              <div class="opening-target-row">
+                <label for="doorSelect">対象</label>
+                <select id="doorSelect" title="編雁E��るドア"></select>
+              </div>
+              <div class="opening-action-row">
+                <button type="button" class="saved-card-btn" id="btnAddDoor">追加</button>
+                <button type="button" class="saved-card-btn danger" id="btnRemoveDoor">削除</button>
+              </div>
+            </div>
             <div class="control-row">
-              <label for="doorWall">配置する壁</label>
-              <select id="doorWall" title="ドアを配置する壁">
-                <option value="south">南（手前）</option>
-                <option value="north">北（奥）</option>
-                <option value="west">西（左）</option>
-                <option value="east">東（右）</option>
+              <label for="doorType">種顁E/label>
+              <select id="doorType" title="ドアの種顁E>
+                <option value="single">牁E��きドア</option>
+                <option value="sliding">引き戸</option>
+                <option value="bifold">折れ戸</option>
+                <option value="entrance">玁E��ドア</option>
+              </select>
+            </div>
+            <div class="control-row">
+              <label for="doorWall">配置する壁E/label>
+              <select id="doorWall" title="ドアを�E置する壁E>
+                <option value="south">南（手前！E/option>
+                <option value="north">北（奥�E�E/option>
+                <option value="west">西�E�左�E�E/option>
+                <option value="east">東�E�右�E�E/option>
               </select>
             </div>
             <div class="control-row">
@@ -155,23 +196,49 @@
               <span class="val" id="doorPosVal">50%</span>
             </div>
             <div class="control-row">
-              <label for="doorWidth">幅</label>
+              <label for="doorWidth">幁E/label>
               <div class="input-with-unit small">
                 <input type="number" id="doorWidth" value="800" min="600" max="1200" step="50">
                 <span class="unit">mm</span>
               </div>
             </div>
+            <div class="control-row">
+              <label for="doorHeight">高さ</label>
+              <div class="input-with-unit small">
+                <input type="number" id="doorHeight" value="2100" min="1800" max="2600" step="50">
+                <span class="unit">mm</span>
+              </div>
+            </div>
           </div>
 
-          <h3>窓</h3>
+          <h3>突E/h3>
           <div class="opening-control">
+            <div class="control-row opening-toolbar">
+              <div class="opening-target-row">
+                <label for="windowSelect">対象</label>
+                <select id="windowSelect" title="編雁E��る突E></select>
+              </div>
+              <div class="opening-action-row">
+                <button type="button" class="saved-card-btn" id="btnAddWindow">追加</button>
+                <button type="button" class="saved-card-btn danger" id="btnRemoveWindow">削除</button>
+              </div>
+            </div>
             <div class="control-row">
-              <label for="windowWall">配置する壁</label>
-              <select id="windowWall" title="窓を配置する壁">
-                <option value="north" selected>北（奥）</option>
-                <option value="south">南（手前）</option>
-                <option value="west">西（左）</option>
-                <option value="east">東（右）</option>
+              <label for="windowType">種顁E/label>
+              <select id="windowType" title="窓�E種顁E>
+                <option value="sliding">引違ぁE��E/option>
+                <option value="fix">FIX突E/option>
+                <option value="casement">縦すべり突E/option>
+                <option value="sweepout">掁E��出し突E/option>
+              </select>
+            </div>
+            <div class="control-row">
+              <label for="windowWall">配置する壁E/label>
+              <select id="windowWall" title="窓を配置する壁E>
+                <option value="north" selected>北（奥�E�E/option>
+                <option value="south">南（手前！E/option>
+                <option value="west">西�E�左�E�E/option>
+                <option value="east">東�E�右�E�E/option>
               </select>
             </div>
             <div class="control-row">
@@ -180,7 +247,7 @@
               <span class="val" id="windowPosVal">50%</span>
             </div>
             <div class="control-row">
-              <label for="windowW">幅</label>
+              <label for="windowW">幁E/label>
               <div class="input-with-unit small">
                 <input type="number" id="windowW" value="1800" min="500" max="4000" step="100">
                 <span class="unit">mm</span>
@@ -193,28 +260,35 @@
                 <span class="unit">mm</span>
               </div>
             </div>
+            <div class="control-row">
+              <label for="windowBottom">下端髁E/label>
+              <div class="input-with-unit small">
+                <input type="number" id="windowBottom" value="900" min="0" max="1800" step="50">
+                <span class="unit">mm</span>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- STEP 3: 素材 -->
+        <!-- STEP 3: 素杁E-->
         <div class="step-content" id="step-materials">
-          <h3>床</h3>
+          <h3>庁E/h3>
           <div class="material-swatches" id="floorSwatches">
             <button class="swatch active" data-color="#c8a876" title="オーク"><span></span></button>
-            <button class="swatch" data-color="#a0784c" title="ウォールナット"><span></span></button>
+            <button class="swatch" data-color="#a0784c" title="ウォールナッチE><span></span></button>
             <button class="swatch" data-color="#ddc89e" title="メープル"><span></span></button>
             <button class="swatch" data-color="#b89070" title="チェリー"><span></span></button>
-            <button class="swatch" data-color="#e8dcc8" title="アッシュ"><span></span></button>
-            <button class="swatch" data-color="#8c8c8c" title="コンクリート"><span></span></button>
-            <button class="swatch" data-color="#f0f0f0" title="ホワイト"><span></span></button>
-            <button class="swatch" data-color="#e0d5c0" title="ベージュ"><span></span></button>
+            <button class="swatch" data-color="#e8dcc8" title="アチE��ュ"><span></span></button>
+            <button class="swatch" data-color="#8c8c8c" title="コンクリーチE><span></span></button>
+            <button class="swatch" data-color="#f0f0f0" title="ホワイチE><span></span></button>
+            <button class="swatch" data-color="#e0d5c0" title="ベ�Eジュ"><span></span></button>
           </div>
 
-          <h3>壁</h3>
+          <h3>壁E/h3>
           <div class="material-swatches" id="wallSwatches">
-            <button class="swatch active" data-color="#f5f0e8" title="オフホワイト"><span></span></button>
-            <button class="swatch" data-color="#ffffff" title="ホワイト"><span></span></button>
-            <button class="swatch" data-color="#e8e4dc" title="ベージュ"><span></span></button>
+            <button class="swatch active" data-color="#f5f0e8" title="オフ�EワイチE><span></span></button>
+            <button class="swatch" data-color="#ffffff" title="ホワイチE><span></span></button>
+            <button class="swatch" data-color="#e8e4dc" title="ベ�Eジュ"><span></span></button>
             <button class="swatch" data-color="#d4cfc5" title="グレージュ"><span></span></button>
             <button class="swatch" data-color="#c0c0c0" title="グレー"><span></span></button>
             <button class="swatch" data-color="#d5e0d0" title="グリーン"><span></span></button>
@@ -222,17 +296,20 @@
             <button class="swatch" data-color="#e0d4c8" title="ピンク"><span></span></button>
           </div>
 
-          <h3>天井</h3>
+          <h3>天亁E/h3>
           <div class="material-swatches" id="ceilingSwatches">
-            <button class="swatch active" data-color="#ffffff" title="ホワイト"><span></span></button>
+            <button class="swatch active" data-color="#ffffff" title="ホワイチE><span></span></button>
             <button class="swatch" data-color="#f5f5f0" title="アイボリー"><span></span></button>
             <button class="swatch" data-color="#e0e0e0" title="ライトグレー"><span></span></button>
-            <button class="swatch" data-color="#d8ccb8" title="ウッド"><span></span></button>
+            <button class="swatch" data-color="#d8ccb8" title="ウチE��"><span></span></button>
           </div>
         </div>
 
         <!-- STEP 4: 家具 -->
         <div class="step-content" id="step-furniture">
+          <div class="catalog-search-box">
+            <input type="search" id="catalogSearch" placeholder="🔍 家具を検索..." autocomplete="off">
+          </div>
           <h3>リビング</h3>
           <div class="furniture-catalog">
             <button class="catalog-item" data-type="sofa">
@@ -241,18 +318,18 @@
               <div class="catalog-size">W1800×D800</div>
             </button>
             <button class="catalog-item" data-type="table">
-              <div class="catalog-icon">☕</div>
-              <div class="catalog-name">テーブル</div>
+              <div class="catalog-icon">☁E/div>
+              <div class="catalog-name">チE�Eブル</div>
               <div class="catalog-size">W1000×D600</div>
             </button>
             <button class="catalog-item" data-type="tv">
               <div class="catalog-icon">📺</div>
-              <div class="catalog-name">テレビ台</div>
+              <div class="catalog-name">チE��ビ台</div>
               <div class="catalog-size">W1200×D400</div>
             </button>
             <button class="catalog-item" data-type="bookshelf">
               <div class="catalog-icon">📚</div>
-              <div class="catalog-name">本棚</div>
+              <div class="catalog-name">本棁E/div>
               <div class="catalog-size">W800×D350</div>
             </button>
             <button class="catalog-item" data-type="rug">
@@ -267,7 +344,7 @@
             </button>
             <button class="catalog-item" data-type="lamp">
               <div class="catalog-icon">💡</div>
-              <div class="catalog-name">フロアランプ</div>
+              <div class="catalog-name">フロアランチE/div>
               <div class="catalog-size">W350×D350</div>
             </button>
           </div>
@@ -276,11 +353,11 @@
           <div class="furniture-catalog">
             <button class="catalog-item" data-type="diningTable">
               <div class="catalog-icon">🍽</div>
-              <div class="catalog-name">ダイニングテーブル</div>
+              <div class="catalog-name">ダイニングチE�Eブル</div>
               <div class="catalog-size">W1500×D800</div>
             </button>
             <button class="catalog-item" data-type="chair">
-              <div class="catalog-icon">🪑</div>
+              <div class="catalog-icon">🪁E/div>
               <div class="catalog-name">チェア</div>
               <div class="catalog-size">W450×D450</div>
             </button>
@@ -290,41 +367,41 @@
           <div class="furniture-catalog">
             <button class="catalog-item" data-type="bed">
               <div class="catalog-icon">🛏</div>
-              <div class="catalog-name">ベッド</div>
+              <div class="catalog-name">ベッチE/div>
               <div class="catalog-size">W1400×D2000</div>
             </button>
             <button class="catalog-item" data-type="wardrobe">
               <div class="catalog-icon">🚪</div>
-              <div class="catalog-name">ワードローブ</div>
+              <div class="catalog-name">ワードローチE/div>
               <div class="catalog-size">W1000×D550</div>
             </button>
             <button class="catalog-item" data-type="desk">
               <div class="catalog-icon">🖥</div>
-              <div class="catalog-name">デスク</div>
+              <div class="catalog-name">チE��ク</div>
               <div class="catalog-size">W1200×D600</div>
             </button>
           </div>
 
-          <h3>キッチン</h3>
+          <h3>キチE��ン</h3>
           <div class="furniture-catalog">
             <button class="catalog-item" data-type="kitchen">
               <div class="catalog-icon">🍳</div>
-              <div class="catalog-name">システムキッチン</div>
+              <div class="catalog-name">シスチE��キチE��ン</div>
               <div class="catalog-size">W2550×D650</div>
             </button>
             <button class="catalog-item" data-type="kitchenSmall">
               <div class="catalog-icon">🍳</div>
-              <div class="catalog-name">ミニキッチン</div>
+              <div class="catalog-name">ミニキチE��ン</div>
               <div class="catalog-size">W1500×D600</div>
             </button>
             <button class="catalog-item" data-type="fridge">
-              <div class="catalog-icon">🧊</div>
+              <div class="catalog-icon">🧁E/div>
               <div class="catalog-name">冷蔵庫</div>
               <div class="catalog-size">W650×D650</div>
             </button>
             <button class="catalog-item" data-type="cupboard">
-              <div class="catalog-icon">🗄️</div>
-              <div class="catalog-name">食器棚</div>
+              <div class="catalog-icon">🗄�E�E/div>
+              <div class="catalog-name">食器棁E/div>
               <div class="catalog-size">W800×D450</div>
             </button>
             <button class="catalog-item" data-type="microwave">
@@ -334,37 +411,105 @@
             </button>
             <button class="catalog-item" data-type="washMachine">
               <div class="catalog-icon">🫧</div>
-              <div class="catalog-name">洗濯機</div>
+              <div class="catalog-name">洗濯橁E/div>
               <div class="catalog-size">W600×D600</div>
             </button>
           </div>
 
-          <h3>壁・間仕切り</h3>
+          <h3>水回り設傁E/h3>
+          <div class="furniture-catalog">
+            <button class="catalog-item" data-type="toilet">
+              <div class="catalog-icon">🚽</div>
+              <div class="catalog-name">トイレ</div>
+              <div class="catalog-size">W400×D700</div>
+            </button>
+            <button class="catalog-item" data-type="washBasin">
+              <div class="catalog-icon">🚿</div>
+              <div class="catalog-name">洗面台</div>
+              <div class="catalog-size">W750×D550</div>
+            </button>
+            <button class="catalog-item" data-type="washBasinWide">
+              <div class="catalog-icon">🚿</div>
+              <div class="catalog-name">洗面化粧台(W)</div>
+              <div class="catalog-size">W1200×D550</div>
+            </button>
+            <button class="catalog-item" data-type="bathtub">
+              <div class="catalog-icon">🛁</div>
+              <div class="catalog-name">バスタチE/div>
+              <div class="catalog-size">W1600×D800</div>
+            </button>
+            <button class="catalog-item" data-type="shower">
+              <div class="catalog-icon">🚿</div>
+              <div class="catalog-name">シャワーユニッチE/div>
+              <div class="catalog-size">W900×D900</div>
+            </button>
+            <button class="catalog-item" data-type="urinalUnit">
+              <div class="catalog-icon">🛁</div>
+              <div class="catalog-name">ユニットバス</div>
+              <div class="catalog-size">W1616×D1316</div>
+            </button>
+          </div>
+
+          <h3>壁�E間仕�EめE/h3>
           <div class="furniture-catalog">
             <button class="catalog-item" data-type="wall1000">
               <div class="catalog-icon">🧱</div>
-              <div class="catalog-name">壁 1m</div>
+              <div class="catalog-name">壁E1m</div>
               <div class="catalog-size">W1000×D120</div>
             </button>
             <button class="catalog-item" data-type="wall1500">
               <div class="catalog-icon">🧱</div>
-              <div class="catalog-name">壁 1.5m</div>
+              <div class="catalog-name">壁E1.5m</div>
               <div class="catalog-size">W1500×D120</div>
             </button>
             <button class="catalog-item" data-type="wall2000">
               <div class="catalog-icon">🧱</div>
-              <div class="catalog-name">壁 2m</div>
+              <div class="catalog-name">壁E2m</div>
               <div class="catalog-size">W2000×D120</div>
             </button>
             <button class="catalog-item" data-type="wall3000">
               <div class="catalog-icon">🧱</div>
-              <div class="catalog-name">壁 3m</div>
+              <div class="catalog-name">壁E3m</div>
               <div class="catalog-size">W3000×D120</div>
             </button>
             <button class="catalog-item" data-type="wallHalf">
               <div class="catalog-icon">🧱</div>
-              <div class="catalog-name">半壁 1m</div>
+              <div class="catalog-name">半壁E1m</div>
               <div class="catalog-size">W1000×H1200</div>
+            </button>
+          </div>
+
+          <h3>そ�E他�Eカスタム</h3>
+          <div class="furniture-catalog">
+            <button class="catalog-item" data-type="customBox">
+              <div class="catalog-icon">📐</div>
+              <div class="catalog-name">カスタムボックス</div>
+              <div class="catalog-size">サイズ変更可</div>
+            </button>
+            <button class="catalog-item" data-type="stairStraight">
+              <div class="catalog-icon">🪁E/div>
+              <div class="catalog-name">直階段</div>
+              <div class="catalog-size">W900×D3000</div>
+            </button>
+            <button class="catalog-item" data-type="stairL">
+              <div class="catalog-icon">🪁E/div>
+              <div class="catalog-name">L型階段</div>
+              <div class="catalog-size">W2000×D2000</div>
+            </button>
+            <button class="catalog-item" data-type="stairSpiral">
+              <div class="catalog-icon">🌀</div>
+              <div class="catalog-name">らせん階段</div>
+              <div class="catalog-size">W1200×D1200</div>
+            </button>
+            <button class="catalog-item" data-type="entryPorch">
+              <div class="catalog-icon">🚪</div>
+              <div class="catalog-name">玁E��ポ�EチE/div>
+              <div class="catalog-size">W1800×D1200</div>
+            </button>
+            <button class="catalog-item" data-type="hallway">
+              <div class="catalog-icon">🚶</div>
+              <div class="catalog-name">土間・廊丁E/div>
+              <div class="catalog-size">W1800×D1800</div>
             </button>
           </div>
 
@@ -374,14 +519,14 @@
             <div class="sel-controls">
               <div class="sel-size-group">
                 <div class="sel-size-input">
-                  <label for="selW">幅(W)</label>
+                  <label for="selW">幁EW)</label>
                   <div class="input-with-unit small">
                     <input type="number" id="selW" min="100" max="5000" step="50">
                     <span class="unit">mm</span>
                   </div>
                 </div>
                 <div class="sel-size-input">
-                  <label for="selD">奥行(D)</label>
+                  <label for="selD">奥衁ED)</label>
                   <div class="input-with-unit small">
                     <input type="number" id="selD" min="100" max="5000" step="50">
                     <span class="unit">mm</span>
@@ -403,11 +548,18 @@
               </div>
               <div class="sel-actions">
                 <button class="sel-btn" id="btnRotate90">90°回転</button>
-                <button class="sel-btn" id="btnResetSize">サイズリセット</button>
-                <button class="sel-btn" id="btnDuplicate">複製</button>
+                <button class="sel-btn" id="btnResetSize">サイズリセチE��</button>
+                <button class="sel-btn" id="btnDuplicate">褁E��</button>
                 <button class="sel-btn danger" id="btnDelete">削除</button>
               </div>
-            </div>
+              <div class="control-row">
+                <label for="selColor">色</label>
+                <input type="color" id="selColor" value="#8b7355">
+                <button class="sel-btn small" id="btnResetColor">リセチE��</button>
+              </div>              <div class="control-row" id="groupControls">
+                <button class="sel-btn small" id="btnGroup">グループ化</button>
+                <button class="sel-btn small" id="btnUngroup">解除</button>
+              </div>            </div>
           </div>
         </div>
       </aside>
@@ -419,22 +571,32 @@
         <!-- 3Dビュー -->
         <canvas id="canvas3d" class="hidden"></canvas>
 
-        <!-- 下部ツールバー -->
+        <!-- 下部チE�Eルバ�E -->
         <div id="bottom-bar">
           <div class="bottom-left">
             <span id="roomDims"></span>
           </div>
           <div class="bottom-center">
-            <button class="bottom-btn" id="btnZoomIn" title="ズームイン">＋</button>
-            <button class="bottom-btn" id="btnZoomOut" title="ズームアウト">－</button>
-            <button class="bottom-btn" id="btnFitView" title="全体表示">⊞</button>
+            <button class="bottom-btn" id="btnZoomIn" title="ズームイン">�E�E/button>
+            <button class="bottom-btn" id="btnZoomOut" title="ズームアウチE>�E�E/button>
+            <button class="bottom-btn" id="btnFitView" title="全体表示">⊁E/button>
           </div>
           <div class="bottom-right">
             <label class="snap-label">
-              <input type="checkbox" id="snapToggle" checked>
-              スナップ
+              <input type="checkbox" id="gridToggle" checked>
+              グリチE��
             </label>
-            <select id="snapSizeSelect" class="snap-size-select" title="スナップ間隔">
+            <label class="snap-label">
+              <input type="checkbox" id="roomLabelToggle">
+              部屋名
+            </label>            <label class="snap-label" title="壁の厚さ">
+              壁厚 <input type="range" id="wallThicknessRange" min="0" max="300" step="10" value="120">
+              <span id="wallThicknessVal">120</span>mm
+            </label>            <label class="snap-label">
+              <input type="checkbox" id="snapToggle" checked>
+              スナッチE
+            </label>
+            <select id="snapSizeSelect" class="snap-size-select" title="スナップ間隁E>
               <option value="50" selected>50mm</option>
               <option value="100">100mm</option>
               <option value="250">250mm</option>
