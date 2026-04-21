@@ -86,7 +86,7 @@ export class RoomScene3D {
     this.clearScene();
 
     const state = this.stateManager.state;
-    const room = this.stateManager.getPrimaryRoom() || state.room;
+    const room = this.stateManager.getActiveRoom() || this.stateManager.getPrimaryRoom() || state.room;
     const roomWidthM = room.w / 1000;
     const roomDepthM = room.d / 1000;
     const roomHeightM = room.h / 1000;
@@ -104,7 +104,10 @@ export class RoomScene3D {
       this.buildWall(wallName, roomWidthM, roomHeightM, roomDepthM);
     });
 
-    state.furnitureItems.forEach(item => this.buildFurniture(item));
+    // アクティブ部屋に属する家具のみ描画
+    state.furnitureItems
+      .filter(item => item.roomId === room.id)
+      .forEach(item => this.buildFurniture(item, room));
 
     if (!state.cameraInitialized3d) {
       state.cameraInitialized3d = true;
@@ -268,9 +271,13 @@ export class RoomScene3D {
     }
   }
 
-  buildFurniture(item) {
+  buildFurniture(item, room = null) {
     const definition = FURNITURE_DEFS[item.type];
     if (!definition) return;
+
+    const baseRoom = room || this.stateManager.state.rooms.find(r => r.id === item.roomId) || this.stateManager.getActiveRoom();
+    const baseX = baseRoom?.x || 0;
+    const baseY = baseRoom?.y || 0;
 
     const size = this.stateManager.getItemSize(item);
     const widthM = size.w / 1000;
@@ -288,7 +295,7 @@ export class RoomScene3D {
     group.add(body);
 
     this.addFurnitureDetails(group, item.type, widthM, depthM, heightM, definition);
-    group.position.set(item.x / 1000, 0, item.y / 1000);
+    group.position.set((item.x - baseX) / 1000, 0, (item.y - baseY) / 1000);
     group.rotation.y = -(item.rotation || 0) * Math.PI / 180;
 
     if (item.id === this.stateManager.state.selectedId) {

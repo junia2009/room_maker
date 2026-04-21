@@ -195,6 +195,7 @@ export class RoomMakerState {
     if (index === -1) return false;
     this.state.rooms.splice(index, 1);
     this.state.openings = this.state.openings.filter(opening => opening.roomId !== id);
+    this.state.furnitureItems = this.state.furnitureItems.filter(item => item.roomId !== id);
     this.state.walls = this.state.rooms.flatMap(r => createRectWalls(r));
     if (this.state.activeRoomId === id) {
       this.state.activeRoomId = this.state.rooms[Math.max(0, index - 1)].id;
@@ -397,6 +398,13 @@ export class RoomMakerState {
       this.loadLegacyStructure(data);
     }
     this.state.furnitureItems = Array.isArray(data.furnitureItems) ? data.furnitureItems.map(item => ({ ...item })) : [];
+    // 旧データ互換: roomId未設定の家具はprimary roomに紐付け
+    const primaryId = this.getPrimaryRoom()?.id;
+    this.state.furnitureItems.forEach(item => {
+      if (!item.roomId || !this.state.rooms.find(r => r.id === item.roomId)) {
+        item.roomId = primaryId;
+      }
+    });
     this.state.nextId = data.nextId || 1;
     this.state.selectedId = null;
     if (!options.silent) this.emitChange('loadProjectData');
@@ -502,6 +510,7 @@ export class RoomMakerState {
     const room = this.getActiveRoom() || this.getPrimaryRoom() || this.state.room;
     const item = {
       id: this.state.nextId++,
+      roomId: room.id,
       type,
       x: room.x + room.w / 2,
       y: room.y + room.d / 2,
