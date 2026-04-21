@@ -41,6 +41,7 @@ export const DEFAULT_STATE = {
   showGrid: true,
   northAngle: 0,
   showRoomLabel: false,
+  showDimensions: true,
   furnitureGroups: [],  // [{id, memberIds:[]}]
   multiSelectIds: [],   // 複数選択中のID一覧
   wallThickness: 120,   // mm

@@ -83,7 +83,9 @@ export class Floorplan2D {
     if (rooms.length > 1) this.drawRoomConnections(rooms);
     rooms.forEach(room => this.drawSingleRoom(room, room.id === activeId));
     this.stateManager.state.furnitureItems.forEach(item => this.drawFurniture(item));
-    rooms.forEach(room => this.drawDimensions(room));
+    if (this.stateManager.state.showDimensions !== false) {
+      rooms.forEach(room => this.drawDimensions(room));
+    }
     this.drawSelectedDistances();
     this.drawCompass(canvasWidth, canvasHeight);
   }
@@ -757,42 +759,159 @@ export class Floorplan2D {
     const topLeft = this.worldToScreen(room.x, room.y);
     const bottomRight = this.worldToScreen(room.x + room.w, room.y + room.d);
 
-    this.ctx.fillStyle = '#666';
-    this.ctx.font = '11px sans-serif';
-    this.ctx.textAlign = 'center';
-    this.ctx.textBaseline = 'middle';
+    // 各壁の開口部を取得（位置順、mm 単位の [start, end]）
+    const wallOpenings = wallName => {
+      const isHorizontal = wallName === 'south' || wallName === 'north';
+      const length = isHorizontal ? room.w : room.d;
+      return this.stateManager.getOpeningsForWall(wallName, room.id)
+        .map(op => ({
+          start: length * (op.positionPercent / 100) - op.width / 2,
+          end: length * (op.positionPercent / 100) + op.width / 2,
+          kind: op.kind,
+        }))
+        .filter(seg => seg.end > 0 && seg.start < length)
+        .sort((a, b) => a.start - b.start);
+    };
 
-    const topY = topLeft.y - 18;
-    this.ctx.beginPath();
-    this.ctx.moveTo(topLeft.x, topY);
-    this.ctx.lineTo(bottomRight.x, topY);
-    this.ctx.strokeStyle = '#999';
-    this.ctx.lineWidth = 1;
-    this.ctx.stroke();
-    this.ctx.beginPath();
-    this.ctx.moveTo(topLeft.x, topY - 4);
-    this.ctx.lineTo(topLeft.x, topY + 4);
-    this.ctx.moveTo(bottomRight.x, topY - 4);
-    this.ctx.lineTo(bottomRight.x, topY + 4);
-    this.ctx.stroke();
-    this.ctx.fillText(`${room.w} mm`, (topLeft.x + bottomRight.x) / 2, topY - 10);
+    // チェーン分割: [0, op1.start, op1.end, op2.start, ..., length] のユニーク配列
+    const chainSplits = (length, openings) => {
+      const points = [0, length];
+      openings.forEach(op => {
+        points.push(Math.max(0, op.start));
+        points.push(Math.min(length, op.end));
+      });
+      const sorted = [...new Set(points.map(p => Math.round(p)))].sort((a, b) => a - b);
+      return sorted;
+    };
 
-    const leftX = topLeft.x - 18;
-    this.ctx.beginPath();
-    this.ctx.moveTo(leftX, topLeft.y);
-    this.ctx.lineTo(leftX, bottomRight.y);
-    this.ctx.stroke();
-    this.ctx.beginPath();
-    this.ctx.moveTo(leftX - 4, topLeft.y);
-    this.ctx.lineTo(leftX + 4, topLeft.y);
-    this.ctx.moveTo(leftX - 4, bottomRight.y);
-    this.ctx.lineTo(leftX + 4, bottomRight.y);
-    this.ctx.stroke();
-    this.ctx.save();
-    this.ctx.translate(leftX - 10, (topLeft.y + bottomRight.y) / 2);
-    this.ctx.rotate(-Math.PI / 2);
-    this.ctx.fillText(`${room.d} mm`, 0, 0);
-    this.ctx.restore();
+    const OUTER_OFFSET = 38;
+    const CHAIN_OFFSET = 16;
+
+    // 上辺 (north): X 方向のチェーン+総寸法
+    {
+      const ops = wallOpenings('north');
+      if (ops.length > 0) {
+        const splits = chainSplits(room.w, ops);
+        for (let i = 0; i < splits.length - 1; i++) {
+          const sx = this.worldToScreen(room.x + splits[i], room.y).x;
+          const ex = this.worldToScreen(room.x + splits[i + 1], room.y).x;
+          const isOpening = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
+          this.drawHorizontalDim(sx, ex, topLeft.y - CHAIN_OFFSET, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999');
+        }
+      }
+      this.drawHorizontalDim(topLeft.x, bottomRight.x, topLeft.y - OUTER_OFFSET, room.w, '#666');
+    }
+
+    // 下辺 (south)
+    {
+      const ops = wallOpenings('south');
+      if (ops.length > 0) {
+        const splits = chainSplits(room.w, ops);
+        for (let i = 0; i < splits.length - 1; i++) {
+          const sx = this.worldToScreen(room.x + splits[i], room.y).x;
+          const ex = this.worldToScreen(room.x + splits[i + 1], room.y).x;
+          const isOpening = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
+          this.drawHorizontalDim(sx, ex, bottomRight.y + CHAIN_OFFSET, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999', true);
+        }
+      }
+      this.drawHorizontalDim(topLeft.x, bottomRight.x, bottomRight.y + OUTER_OFFSET, room.w, '#666', true);
+    }
+
+    // 左辺 (west)
+    {
+      const ops = wallOpenings('west');
+      if (ops.length > 0) {
+        const splits = chainSplits(room.d, ops);
+        for (let i = 0; i < splits.length - 1; i++) {
+          const sy = this.worldToScreen(room.x, room.y + splits[i]).y;
+          const ey = this.worldToScreen(room.x, room.y + splits[i + 1]).y;
+          const isOpening = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
+          this.drawVerticalDim(topLeft.x - CHAIN_OFFSET, sy, ey, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999');
+        }
+      }
+      this.drawVerticalDim(topLeft.x - OUTER_OFFSET, topLeft.y, bottomRight.y, room.d, '#666');
+    }
+
+    // 右辺 (east)
+    {
+      const ops = wallOpenings('east');
+      if (ops.length > 0) {
+        const splits = chainSplits(room.d, ops);
+        for (let i = 0; i < splits.length - 1; i++) {
+          const sy = this.worldToScreen(room.x, room.y + splits[i]).y;
+          const ey = this.worldToScreen(room.x, room.y + splits[i + 1]).y;
+          const isOpening = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
+          this.drawVerticalDim(bottomRight.x + CHAIN_OFFSET, sy, ey, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999', true);
+        }
+      }
+      this.drawVerticalDim(bottomRight.x + OUTER_OFFSET, topLeft.y, bottomRight.y, room.d, '#666', true);
+    }
+  }
+
+  drawHorizontalDim(x1, x2, screenY, valueMm, color = '#666', labelBelow = false) {
+    if (Math.abs(x2 - x1) < 2) return;
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1;
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.beginPath();
+    ctx.moveTo(x1, screenY);
+    ctx.lineTo(x2, screenY);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(x1, screenY - 4);
+    ctx.lineTo(x1, screenY + 4);
+    ctx.moveTo(x2, screenY - 4);
+    ctx.lineTo(x2, screenY + 4);
+    ctx.stroke();
+    const cx = (x1 + x2) / 2;
+    const ty = labelBelow ? screenY + 10 : screenY - 10;
+    const label = `${Math.round(valueMm)}`;
+    const w = ctx.measureText(label).width + 6;
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillRect(cx - w / 2, ty - 7, w, 14);
+    ctx.fillStyle = color;
+    ctx.fillText(label, cx, ty);
+    ctx.restore();
+  }
+
+  drawVerticalDim(screenX, y1, y2, valueMm, color = '#666', labelRight = false) {
+    if (Math.abs(y2 - y1) < 2) return;
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1;
+    ctx.font = '11px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.beginPath();
+    ctx.moveTo(screenX, y1);
+    ctx.lineTo(screenX, y2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(screenX - 4, y1);
+    ctx.lineTo(screenX + 4, y1);
+    ctx.moveTo(screenX - 4, y2);
+    ctx.lineTo(screenX + 4, y2);
+    ctx.stroke();
+    const cy = (y1 + y2) / 2;
+    const tx = labelRight ? screenX + 10 : screenX - 10;
+    const label = `${Math.round(valueMm)}`;
+    ctx.save();
+    ctx.translate(tx, cy);
+    ctx.rotate(-Math.PI / 2);
+    const w = ctx.measureText(label).width + 6;
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    ctx.fillRect(-w / 2, -7, w, 14);
+    ctx.fillStyle = color;
+    ctx.fillText(label, 0, 0);
+    ctx.restore();
+    ctx.restore();
   }
 
   // 隣接・接触する部屋の間に接続インジケーターを描画

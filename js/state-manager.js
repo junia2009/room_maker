@@ -88,6 +88,7 @@ function cloneDefaultState() {
     showGrid: DEFAULT_STATE.showGrid,
     northAngle: DEFAULT_STATE.northAngle,
     showRoomLabel: DEFAULT_STATE.showRoomLabel,
+    showDimensions: DEFAULT_STATE.showDimensions !== false,
     furnitureGroups: [],
     multiSelectIds: [],
     wallThickness: DEFAULT_STATE.wallThickness,
@@ -477,6 +478,11 @@ export class RoomMakerState {
   setShowRoomLabel(enabled, options = {}) {
     this.state.showRoomLabel = enabled;
     if (!options.silent) this.emitChange('setShowRoomLabel', { enabled });
+  }
+
+  setShowDimensions(enabled, options = {}) {
+    this.state.showDimensions = enabled;
+    if (!options.silent) this.emitChange('setShowDimensions', { enabled });
   }
 
   setWallThickness(thickness, options = {}) {

@@ -13,7 +13,7 @@ export class EditorController {
     this.roomInfoReasons = new Set(['reset', 'loadProjectData', 'setRoomDimensions', 'setActiveRoomId', 'addRoom', 'removeRoom']);
     this.roomControlReasons = new Set(['reset', 'loadProjectData', 'setRoomDimensions', 'addRoom', 'removeRoom', 'setActiveRoomId']);
     this.openingControlReasons = new Set(['reset', 'loadProjectData', 'setDoorConfig', 'setWindowConfig', 'addOpening', 'updateOpening', 'removeOpening', 'setActiveRoomId', 'addRoom', 'removeRoom']);
-    this.materialControlReasons = new Set(['reset', 'loadProjectData', 'setColor', 'setSnapEnabled', 'setSnapSize', 'setShowGrid', 'setNorthAngle', 'setShowRoomLabel']);
+    this.materialControlReasons = new Set(['reset', 'loadProjectData', 'setColor', 'setSnapEnabled', 'setSnapSize', 'setShowGrid', 'setNorthAngle', 'setShowRoomLabel', 'setShowDimensions']);
     this.roomListReasons = new Set(['reset', 'loadProjectData', 'addRoom', 'removeRoom', 'setActiveRoomId', 'setRoomDimensions', 'updateRoomName']);
     this.selectionReasons = new Set([
       'reset',
@@ -38,7 +38,7 @@ export class EditorController {
       'addFurniture', 'removeFurniture', 'duplicateFurniture',
       'updateSelectedSize', 'updateSelectedRotation', 'rotateSelectedBy', 'resetSelectedSize',
       'moveFurniture', 'addRoom', 'removeRoom', 'setActiveRoomId',
-      'setShowGrid', 'setNorthAngle', 'setFurnitureColor', 'undo', 'redo', 'setShowRoomLabel',
+      'setShowGrid', 'setNorthAngle', 'setFurnitureColor', 'undo', 'redo', 'setShowRoomLabel', 'setShowDimensions',
       'multiSelect', 'groupSelected', 'ungroupSelected', 'setWallThickness',
     ]);
     this.sceneReasons = new Set([
@@ -99,6 +99,7 @@ export class EditorController {
       snapSizeSelect: $('snapSizeSelect'),
       gridToggle: $('gridToggle'),
       roomLabelToggle: $('roomLabelToggle'),
+      dimensionsToggle: $('dimensionsToggle'),
       northAngle: $('northAngle'),
       northAngleVal: $('northAngleVal'),
       allRoomsArea: $('allRoomsArea'),
@@ -362,6 +363,9 @@ export class EditorController {
     });
     this.dom.roomLabelToggle.addEventListener('change', () => {
       this.stateManager.setShowRoomLabel(this.dom.roomLabelToggle.checked);
+    });
+    this.dom.dimensionsToggle.addEventListener('change', () => {
+      this.stateManager.setShowDimensions(this.dom.dimensionsToggle.checked);
     });
     const wallRange = document.getElementById('wallThicknessRange');
     const wallVal = document.getElementById('wallThicknessVal');
@@ -654,6 +658,7 @@ export class EditorController {
     this.dom.snapSizeSelect.value = String(state.snapSize);
     this.dom.gridToggle.checked = state.showGrid !== false;
     this.dom.roomLabelToggle.checked = state.showRoomLabel === true;
+    this.dom.dimensionsToggle.checked = state.showDimensions !== false;
     this.dom.northAngle.value = state.northAngle || 0;
     this.dom.northAngleVal.textContent = `${state.northAngle || 0}°`;
     this.syncSwatchState('floorSwatches', state.colors.floor);
