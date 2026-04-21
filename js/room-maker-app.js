@@ -99,8 +99,8 @@ export class RoomMakerApp {
     this.editorController.setProjectName(projectName);
     this.editorController.syncUIFromState();
     this.showEditor();
-    this.floorplan.fitView();
     this.editorController.switchView(this.stateManager.state.viewMode);
+    this.floorplan.fitView();
     this.editorController.renderFromState();
   }
 

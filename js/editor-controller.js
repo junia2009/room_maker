@@ -119,7 +119,6 @@ export class EditorController {
   show() {
     this.dom.app.classList.remove('hidden');
     this.stateManager.setCameraNeedsReset();
-    this.renderFromState();
   }
 
   hide() {
