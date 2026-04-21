@@ -146,7 +146,7 @@ export class RoomScene3D {
     group.name = 'dimensions';
     const y = 0.005;
     const offset = 0.35;       // 外側総寸法のオフセット (m)
-    const innerOffset = 0.15;  // 開口チェーン寸法のオフセット (m)
+    const innerOffset = 0.25;  // 部屋内側のチェーン寸法オフセット (m)
     const tickSize = 0.08;
     const lineMat = new THREE.LineBasicMaterial({ color: 0x666666 });
     const lineMatBlue = new THREE.LineBasicMaterial({ color: 0x4a90d9 });
@@ -210,7 +210,7 @@ export class RoomScene3D {
           const xs = splits[i] / 1000;
           const xe = splits[i + 1] / 1000;
           const isOp = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
-          drawHorizontalDim(xs, xe, -innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
+          drawHorizontalDim(xs, xe, innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
         }
       }
     }
@@ -224,7 +224,7 @@ export class RoomScene3D {
           const xs = splits[i] / 1000;
           const xe = splits[i + 1] / 1000;
           const isOp = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
-          drawHorizontalDim(xs, xe, roomDepthM + innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
+          drawHorizontalDim(xs, xe, roomDepthM - innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
         }
       }
     }
@@ -250,7 +250,7 @@ export class RoomScene3D {
             const centerMm = room.d * (1 - op.positionPercent / 100);
             return Math.round(centerMm - op.width / 2) <= splits[i] && splits[i + 1] <= Math.round(centerMm + op.width / 2);
           });
-          drawVerticalDim(zs, ze, -innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
+          drawVerticalDim(zs, ze, innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
         }
       }
     }
@@ -274,7 +274,7 @@ export class RoomScene3D {
             const centerMm = room.d * (1 - op.positionPercent / 100);
             return Math.round(centerMm - op.width / 2) <= splits[i] && splits[i + 1] <= Math.round(centerMm + op.width / 2);
           });
-          drawVerticalDim(zs, ze, roomWidthM + innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
+          drawVerticalDim(zs, ze, roomWidthM - innerOffset, splits[i + 1] - splits[i], isOp ? '#4a90d9' : '#999');
         }
       }
     }

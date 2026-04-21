@@ -796,7 +796,7 @@ export class Floorplan2D {
           const sx = this.worldToScreen(room.x + splits[i], room.y).x;
           const ex = this.worldToScreen(room.x + splits[i + 1], room.y).x;
           const isOpening = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
-          this.drawHorizontalDim(sx, ex, topLeft.y - CHAIN_OFFSET, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999');
+          this.drawHorizontalDim(sx, ex, topLeft.y + CHAIN_OFFSET, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999', true);
         }
       }
       this.drawHorizontalDim(topLeft.x, bottomRight.x, topLeft.y - OUTER_OFFSET, room.w, '#666');
@@ -811,7 +811,7 @@ export class Floorplan2D {
           const sx = this.worldToScreen(room.x + splits[i], room.y).x;
           const ex = this.worldToScreen(room.x + splits[i + 1], room.y).x;
           const isOpening = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
-          this.drawHorizontalDim(sx, ex, bottomRight.y + CHAIN_OFFSET, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999', true);
+          this.drawHorizontalDim(sx, ex, bottomRight.y - CHAIN_OFFSET, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999', false);
         }
       }
       this.drawHorizontalDim(topLeft.x, bottomRight.x, bottomRight.y + OUTER_OFFSET, room.w, '#666', true);
@@ -826,7 +826,7 @@ export class Floorplan2D {
           const sy = this.worldToScreen(room.x, room.y + splits[i]).y;
           const ey = this.worldToScreen(room.x, room.y + splits[i + 1]).y;
           const isOpening = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
-          this.drawVerticalDim(topLeft.x - CHAIN_OFFSET, sy, ey, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999');
+          this.drawVerticalDim(topLeft.x + CHAIN_OFFSET, sy, ey, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999', true);
         }
       }
       this.drawVerticalDim(topLeft.x - OUTER_OFFSET, topLeft.y, bottomRight.y, room.d, '#666');
@@ -841,7 +841,7 @@ export class Floorplan2D {
           const sy = this.worldToScreen(room.x, room.y + splits[i]).y;
           const ey = this.worldToScreen(room.x, room.y + splits[i + 1]).y;
           const isOpening = ops.some(op => Math.round(op.start) <= splits[i] && splits[i + 1] <= Math.round(op.end));
-          this.drawVerticalDim(bottomRight.x + CHAIN_OFFSET, sy, ey, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999', true);
+          this.drawVerticalDim(bottomRight.x - CHAIN_OFFSET, sy, ey, splits[i + 1] - splits[i], isOpening ? '#4a90d9' : '#999', false);
         }
       }
       this.drawVerticalDim(bottomRight.x + OUTER_OFFSET, topLeft.y, bottomRight.y, room.d, '#666', true);
