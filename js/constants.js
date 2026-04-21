@@ -1,0 +1,42 @@
+export const STORAGE_KEY = 'roommaker_layouts';
+
+export const DEFAULT_STATE = {
+  room: { w: 6000, d: 5000, h: 2400 },
+  colors: { floor: '#c8a876', wall: '#f5f0e8', ceiling: '#ffffff' },
+  door: { wall: 'south', pos: 50, width: 800 },
+  window: { wall: 'north', pos: 50, w: 1800, h: 1200 },
+  furnitureItems: [],
+  selectedId: null,
+  nextId: 1,
+  snap: true,
+  snapSize: 50,
+  viewMode: '2d',
+  currentProjectId: null,
+  cameraInitialized3d: false,
+};
+
+export const FURNITURE_DEFS = {
+  sofa:         { name: 'ソファ', w: 1800, d: 800, h: 750, color: '#8b7355' },
+  table:        { name: 'テーブル', w: 1000, d: 600, h: 400, color: '#a08060' },
+  tv:           { name: 'テレビ台', w: 1200, d: 400, h: 500, color: '#5a4a3a' },
+  bookshelf:    { name: '本棚', w: 800, d: 350, h: 1800, color: '#a08060' },
+  rug:          { name: 'ラグ', w: 2000, d: 1400, h: 10, color: '#c0a888' },
+  plant:        { name: '観葉植物', w: 400, d: 400, h: 1200, color: '#5a8a4a' },
+  lamp:         { name: 'フロアランプ', w: 350, d: 350, h: 1500, color: '#d4c8a0' },
+  diningTable:  { name: 'ダイニングテーブル', w: 1500, d: 800, h: 720, color: '#906a3a' },
+  chair:        { name: 'チェア', w: 450, d: 450, h: 800, color: '#a08060' },
+  bed:          { name: 'ベッド', w: 1400, d: 2000, h: 450, color: '#d0c0a0' },
+  wardrobe:     { name: 'ワードローブ', w: 1000, d: 550, h: 2000, color: '#7a6a5a' },
+  desk:         { name: 'デスク', w: 1200, d: 600, h: 730, color: '#a08060' },
+  fridge:       { name: '冷蔵庫', w: 650, d: 650, h: 1700, color: '#d0d0d0' },
+  kitchen:      { name: 'システムキッチン', w: 2550, d: 650, h: 850, color: '#e0e0e0' },
+  kitchenSmall: { name: 'ミニキッチン', w: 1500, d: 600, h: 850, color: '#e0e0e0' },
+  cupboard:     { name: '食器棚', w: 800, d: 450, h: 1800, color: '#a08060' },
+  microwave:    { name: '電子レンジ', w: 500, d: 400, h: 350, color: '#c0c0c0' },
+  washMachine:  { name: '洗濯機', w: 600, d: 600, h: 1000, color: '#e8e8e8' },
+  wall1000:     { name: '壁 1m', w: 1000, d: 120, h: 2400, color: '#888888' },
+  wall1500:     { name: '壁 1.5m', w: 1500, d: 120, h: 2400, color: '#888888' },
+  wall2000:     { name: '壁 2m', w: 2000, d: 120, h: 2400, color: '#888888' },
+  wall3000:     { name: '壁 3m', w: 3000, d: 120, h: 2400, color: '#888888' },
+  wallHalf:     { name: '半壁 1m', w: 1000, d: 120, h: 1200, color: '#999999' },
+};

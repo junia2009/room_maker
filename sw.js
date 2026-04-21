@@ -1,9 +1,18 @@
-const CACHE_NAME = 'room-maker-v7';
+const CACHE_NAME = 'room-maker-v9';
 const ASSETS = [
   './',
   './index.html',
   './style.css',
   './app.js',
+  './js/constants.js',
+  './js/utils.js',
+  './js/state-manager.js',
+  './js/project-store.js',
+  './js/floorplan-2d.js',
+  './js/room-scene-3d.js',
+  './js/editor-controller.js',
+  './js/project-controller.js',
+  './js/room-maker-app.js',
   './manifest.json',
   './icons/icon-192.png',
   './icons/icon-512.png',
